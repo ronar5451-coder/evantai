@@ -216,14 +216,35 @@ function Footer(){return(<footer className="bg-slate-900 text-slate-300 py-16"><
   <div className="border-t border-slate-700 pt-6 flex flex-col md:flex-row items-center justify-between gap-4"><p className="text-sm text-slate-500">&copy; Evantai, 2026</p><div className="flex gap-6 text-sm text-slate-500">{["Disclaimer","Privacy","Terms"].map(l=><a key={l} href="#" className="hover:text-white transition-colors">{l}</a>)}</div></div>
 </div></footer>);}
 
-function ContactModal({open,onClose}){if(!open)return null;return(<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}><div className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 relative" onClick={e=>e.stopPropagation()}>
+function ContactModal({open,onClose}){
+  const[form,setForm]=useState({first:"",last:"",company:"",email:"",phone:"",message:""});
+  const[sent,setSent]=useState(false);
+  const handleChange=(field)=>(e)=>setForm({...form,[field]:e.target.value});
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    const subject=encodeURIComponent(`New Inquiry from ${form.first} ${form.last} - ${form.company}`);
+    const body=encodeURIComponent(`Name: ${form.first} ${form.last}\nCompany: ${form.company}\nEmail: ${form.email}\nPhone: ${form.phone}\n\nMessage:\n${form.message}`);
+    window.open(`mailto:connect@edantatechnologies.com?subject=${subject}&body=${body}`,"_blank");
+    setSent(true);
+    setTimeout(()=>{setSent(false);setForm({first:"",last:"",company:"",email:"",phone:"",message:""});onClose();},2000);
+  };
+  if(!open)return null;
+  return(<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}><div className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 relative" onClick={e=>e.stopPropagation()}>
   <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200"><Icon name="close" size={20}/></button>
   <img src="/evantailogo.png" alt="Evantai" className="h-10 mb-4"/><h3 className="text-2xl font-bold text-blue-700 mb-1">Try Evantai</h3><p className="text-slate-500 mb-6">Connect with one of our experts</p>
-  <form className="space-y-4" onSubmit={e=>e.preventDefault()}><div className="grid grid-cols-2 gap-4"><input placeholder="First name*" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"/><input placeholder="Last name*" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"/></div>
-  <input placeholder="Company*" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"/>
-  <input placeholder="Email*" type="email" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"/>
-  <textarea placeholder="How can we help?" rows={3} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 resize-none"/>
-  <button type="submit" className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">Submit</button></form>
+  {sent?<div className="text-center py-12"><div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4 text-emerald-600"><Icon name="check" size={32}/></div><h3 className="text-xl font-bold text-slate-900 mb-2">Thank you!</h3><p className="text-slate-500">Your email client will open shortly. We will get back to you within 24 hours.</p></div>
+  :<form className="space-y-4" onSubmit={handleSubmit}>
+    <div className="grid grid-cols-2 gap-4">
+      <input required placeholder="First name*" value={form.first} onChange={handleChange("first")} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"/>
+      <input required placeholder="Last name*" value={form.last} onChange={handleChange("last")} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"/>
+    </div>
+    <input required placeholder="Company*" value={form.company} onChange={handleChange("company")} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"/>
+    <input required placeholder="Email*" type="email" value={form.email} onChange={handleChange("email")} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"/>
+    <input placeholder="Phone" value={form.phone} onChange={handleChange("phone")} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"/>
+    <textarea required placeholder="How can we help?" rows={3} value={form.message} onChange={handleChange("message")} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 resize-none transition-colors"/>
+    <button type="submit" className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">Submit</button>
+    <p className="text-xs text-center text-slate-400">Your inquiry will be sent to connect@edantatechnologies.com</p>
+  </form>}
 </div></div>);}
 
 /* ═══════════════════ PAGES ═══════════════════════════════════ */
